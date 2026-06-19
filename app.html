@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EventPass — Dashboard</title>
+  <meta name="description" content="EventPass organization dashboard">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 120'><path d='M 25 15 H 42 A 8 8 0 0 0 58 15 H 75 A 10 10 0 0 1 85 25 V 95 A 10 10 0 0 1 75 105 H 58 A 8 8 0 0 0 42 105 H 25 A 10 10 0 0 1 15 95 V 25 A 10 10 0 0 1 25 15 Z' fill='%2316A34A'/><rect x='23' y='27' width='54' height='54' rx='8' ry='8' fill='white'/><circle cx='50' cy='42' r='7' fill='%2316A34A'/><path d='M 36 60 C 36 52, 64 52, 64 60 Z' fill='%2316A34A'/><rect x='34' y='66' width='32' height='3.5' rx='1.75' fill='%23E2EDE9'/><rect x='34' y='73' width='20' height='3.5' rx='1.75' fill='%23E2EDE9'/><circle cx='76' cy='90' r='17' fill='white'/><circle cx='76' cy='90' r='13.5' fill='%2316A34A'/><path d='M 70 90 L 74 94 L 82 86' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>">
+
+  <!--
+    ╔══════════════════════════════════════════════════════════════╗
+    ║  EVENTPASS CONFIGURATION                                     ║
+    ║  Replace with your Supabase project values.                  ║
+    ║  Find these in: Supabase Dashboard → Project Settings → API  ║
+    ╚══════════════════════════════════════════════════════════════╝
+  -->
+  <meta name="supabase-url" content="https://srsxjaoabhyagpukslyk.supabase.co">
+  <meta name="supabase-anon-key" content="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNyc3hqYW9hYmh5YWdwdWtzbHlrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyMDcxNzksImV4cCI6MjA5Njc4MzE3OX0.xPSRlh8srEkXeQkP70lfZ7JspZvjMZSl1PkSSOvHO9o">
+  <meta name="app-env" content="development">
+
+  <!-- Design System -->
+  <link rel="stylesheet" href="/src/assets/css/app.css">
+
+  <!-- External Libraries (CDN) -->
+  <!-- QR Code generation: qrcode.js -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <!-- QR Code scanner: html5-qrcode -->
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <!-- Supabase client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+  <style>
+    /* Inline critical-path styles (prevent flash of unstyled content) */
+    html { background: #F7FAF8; }
+    body { background: #F7FAF8; }
+  </style>
+</head>
+<body>
+  <!-- App shell is injected by src/app.js -->
+  <div id="app-loading" style="
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #F7FAF8;
+    flex-direction: column;
+    gap: 16px;
+  ">
+    <div style="
+      width: 32px; height: 32px;
+      border: 3px solid #E2EDE9;
+      border-top-color: #16A34A;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    "></div>
+    <div style="font-size:13px;color:#6B7280;font-family:Inter,sans-serif;">Loading EventPass...</div>
+  </div>
+
+  <style>
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+
+  <!-- App bootstrap (ES module) -->
+  <script type="module" src="/src/app.js"></script>
+</body>
+</html>

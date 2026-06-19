@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script>
+    // Redirect password recovery link or email confirmations to correct destinations
+    const params = new URLSearchParams(window.location.search);
+    const hash = window.location.hash;
+    const isRecovery = hash.includes('type=recovery') || params.get('type') === 'recovery';
+    const isConfirm = hash.includes('access_token=') || params.has('code');
+    
+    if (isRecovery) {
+      window.location.href = 'reset-password.html' + window.location.search + window.location.hash;
+    } else if (isConfirm) {
+      window.location.href = 'app.html' + window.location.search + window.location.hash;
+    }
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EventPass — Event Management for Organizations</title>
+  <meta name="description" content="EventPass is a production-grade event management SaaS platform for NGOs, universities, bootcamps, and enterprises. Create events, manage registrations, track attendance, and issue certificates.">
+  <meta property="og:title" content="EventPass — Event Management Platform">
+  <meta property="og:description" content="Create events, manage registrations, track attendance, and issue certificates for your organization.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 120'><path d='M 25 15 H 42 A 8 8 0 0 0 58 15 H 75 A 10 10 0 0 1 85 25 V 95 A 10 10 0 0 1 75 105 H 58 A 8 8 0 0 0 42 105 H 25 A 10 10 0 0 1 15 95 V 25 A 10 10 0 0 1 25 15 Z' fill='%2316A34A'/><rect x='23' y='27' width='54' height='54' rx='8' ry='8' fill='white'/><circle cx='50' cy='42' r='7' fill='%2316A34A'/><path d='M 36 60 C 36 52, 64 52, 64 60 Z' fill='%2316A34A'/><rect x='34' y='66' width='32' height='3.5' rx='1.75' fill='%23E2EDE9'/><rect x='34' y='73' width='20' height='3.5' rx='1.75' fill='%23E2EDE9'/><circle cx='76' cy='90' r='17' fill='white'/><circle cx='76' cy='90' r='13.5' fill='%2316A34A'/><path d='M 70 90 L 74 94 L 82 86' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: #F7FAF8;
+      color: #111827;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+
+    /* Nav */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 0 48px; height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid #E2EDE9;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; }
+    .nav-logo-icon { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
+    .nav-logo-text { font-size: 18px; font-weight: 700; color: #111827; }
+    .nav-links { display: flex; align-items: center; gap: 32px; }
+    .nav-links a { font-size: 14px; color: #4B5563; transition: color 0.15s; }
+    .nav-links a:hover { color: #111827; }
+    .nav-actions { display: flex; gap: 12px; }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 0 18px; height: 36px;
+      border-radius: 8px; font-size: 13px; font-weight: 500;
+      cursor: pointer; border: 1px solid transparent;
+      transition: all 0.12s; white-space: nowrap;
+      font-family: inherit;
+    }
+    .btn-primary { background: #16A34A; color: #fff; border-color: #16A34A; }
+    .btn-primary:hover { background: #15803D; }
+    .btn-ghost { background: transparent; color: #4B5563; border-color: #E2EDE9; }
+    .btn-ghost:hover { background: #F0F7F4; color: #111827; }
+    .btn-lg { height: 48px; padding: 0 28px; font-size: 15px; border-radius: 10px; }
+    .btn-xl { height: 56px; padding: 0 36px; font-size: 16px; font-weight: 600; border-radius: 12px; }
+    .btn-outline { background: transparent; color: #111827; border-color: #E2EDE9; }
+    .btn-outline:hover { background: #F0F7F4; border-color: #16A34A; }
+
+    /* Hero */
+    .hero {
+      padding: 140px 24px 80px;
+      text-align: center;
+      max-width: 840px;
+      margin: 0 auto;
+    }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 14px;
+      background: #F0F7F4;
+      border: 1px solid #E2EDE9;
+      border-radius: 9999px;
+      font-size: 12px; font-weight: 500; color: #15803D;
+      margin-bottom: 28px;
+    }
+    .hero-eyebrow::before { content: '●'; color: #16A34A; font-size: 8px; }
+    .hero-headline {
+      font-size: clamp(38px, 6vw, 68px);
+      font-weight: 800;
+      line-height: 1.08;
+      letter-spacing: -2px;
+      margin-bottom: 24px;
+      color: #111827;
+    }
+    .hero-headline span {
+      color: #16A34A;
+    }
+    .hero-sub {
+      font-size: 18px; color: #4B5563; line-height: 1.7;
+      max-width: 540px; margin: 0 auto 40px;
+    }
+    .hero-cta { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 16px; }
+    .hero-trust { font-size: 12px; color: #6B7280; margin-top: 14px; }
+
+    /* Features */
+    .section { padding: 80px 24px; max-width: 1100px; margin: 0 auto; }
+    .section-title { font-size: clamp(24px, 4vw, 40px); font-weight: 700; letter-spacing: -1px; text-align: center; margin-bottom: 12px; color: #111827; }
+    .section-sub { font-size: 15px; color: #4B5563; text-align: center; max-width: 480px; margin: 0 auto 48px; }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .feature-card {
+      background: #ffffff;
+      border: 1px solid #E2EDE9;
+      border-radius: 16px;
+      padding: 28px;
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+    .feature-card:hover { border-color: #16A34A; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(22, 163, 74, 0.05); }
+    .feature-icon {
+      margin-bottom: 16px; width: 48px; height: 48px;
+      background: #F0F7F4; border-radius: 12px; display: flex;
+      align-items: center; justify-content: center; color: #16A34A;
+    }
+    .feature-title { font-size: 15px; font-weight: 600; margin-bottom: 8px; color: #111827; }
+    .feature-text { font-size: 13px; color: #4B5563; line-height: 1.6; }
+
+    /* Social Proof */
+    .logos-bar {
+      text-align: center;
+      padding: 40px 24px 60px;
+      border-top: 1px solid #E2EDE9;
+    }
+    .logos-label { font-size: 12px; color: #6B7280; margin-bottom: 20px; }
+    .logos-row { display: flex; justify-content: center; align-items: center; gap: 40px; flex-wrap: wrap; }
+    .logo-item { font-size: 13px; font-weight: 600; color: #4B5563; }
+
+    /* Screenshot Demo */
+    .demo-section {
+      max-width: 1000px; margin: 0 auto; padding: 0 24px 80px;
+    }
+    .demo-frame {
+      background: #ffffff;
+      border: 1px solid #E2EDE9;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.05);
+    }
+    .demo-topbar {
+      background: #F7FAF8;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-bottom: 1px solid #E2EDE9;
+    }
+    .demo-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+    /* Stats Row */
+    .stats-row {
+      display: flex; justify-content: center; gap: 60px; flex-wrap: wrap;
+      padding: 60px 24px;
+      border-top: 1px solid #E2EDE9;
+      border-bottom: 1px solid #E2EDE9;
+    }
+    .stat-item { text-align: center; }
+    .stat-num { font-size: 36px; font-weight: 800; color: #16A34A; }
+    .stat-lbl { font-size: 13px; color: #4B5563; margin-top: 4px; }
+
+    /* CTA Section */
+    .cta-section {
+      text-align: center;
+      padding: 80px 24px;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+    .cta-title { font-size: 36px; font-weight: 800; letter-spacing: -1px; margin-bottom: 16px; color: #111827; }
+    .cta-sub { font-size: 16px; color: #4B5563; margin-bottom: 32px; }
+
+    /* Footer */
+    .footer {
+      border-top: 1px solid #E2EDE9;
+      padding: 32px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      background: #ffffff;
+    }
+    .footer-logo { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: #4B5563; }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a { font-size: 13px; color: #4B5563; }
+    .footer-links a:hover { color: #111827; }
+
+    @media (max-width: 680px) {
+      .nav { padding: 0 16px; }
+      .nav-links { display: none; }
+      .stats-row { gap: 32px; }
+      .footer { padding: 24px 16px; flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav-logo">
+      <div class="nav-logo-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" width="32" height="32" fill="none"><path d="M 25 15 H 42 A 8 8 0 0 0 58 15 H 75 A 10 10 0 0 1 85 25 V 95 A 10 10 0 0 1 75 105 H 58 A 8 8 0 0 0 42 105 H 25 A 10 10 0 0 1 15 95 V 25 A 10 10 0 0 1 25 15 Z" fill="#16A34A" /><rect x="23" y="27" width="54" height="54" rx="8" ry="8" fill="white" /><circle cx="50" cy="42" r="7" fill="#16A34A" /><path d="M 36 60 C 36 52, 64 52, 64 60 Z" fill="#16A34A" /><rect x="34" y="66" width="32" height="3.5" rx="1.75" fill="#E2EDE9" /><rect x="34" y="73" width="20" height="3.5" rx="1.75" fill="#E2EDE9" /><circle cx="76" cy="90" r="17" fill="white" /><circle cx="76" cy="90" r="13.5" fill="#16A34A" /><path d="M 70 90 L 74 94 L 82 86" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" /></svg></div>
+      <span class="nav-logo-text">EventPass</span>
+    </div>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#who">Who it's for</a>
+      <a href="app.html">Dashboard</a>
+    </div>
+    <div class="nav-actions">
+      <a href="app.html#/login" class="btn btn-ghost">Sign In</a>
+      <a href="app.html#/signup" class="btn btn-primary">Get Started Free</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-eyebrow">Built for African Organizations</div>
+    <h1 class="hero-headline">
+      Event Management<br>
+      <span>Built for Scale</span>
+    </h1>
+    <p class="hero-sub">
+      Create events, manage registrations, check in attendees with QR codes, and issue professional certificates — all in one platform.
+    </p>
+    <div class="hero-cta">
+      <a href="app.html#/signup" class="btn btn-primary btn-xl" style="display:inline-flex;align-items:center;gap:6px;">
+        <span>Start for Free</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+      <a href="app.html#/login" class="btn btn-outline btn-xl">Sign In</a>
+    </div>
+    <div class="hero-trust">Free for up to 5 events · No credit card required</div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-item">
+      <div class="stat-num">10K+</div>
+      <div class="stat-lbl">Participants managed</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">500+</div>
+      <div class="stat-lbl">Events created</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">99.9%</div>
+      <div class="stat-lbl">Check-in success rate</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">50+</div>
+      <div class="stat-lbl">Organizations</div>
+    </div>
+  </div>
+
+  <!-- Features -->
+  <div class="section" id="features">
+    <h2 class="section-title">Everything you need to run events</h2>
+    <p class="section-sub">From registration to certificate — EventPass handles the full lifecycle.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div class="feature-title">Event Management</div>
+        <div class="feature-text">Create, publish, and manage events with custom forms, capacities, waitlists, and approval workflows.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        </div>
+        <div class="feature-title">Smart Registration</div>
+        <div class="feature-text">Custom registration fields, email confirmations, and unique QR-coded tickets — all automatically.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        </div>
+        <div class="feature-title">QR Check-in</div>
+        <div class="feature-text">Scan QR codes instantly on any device. See attendance counts update live as attendees arrive.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34"/><path d="M12 2a6 6 0 0 0-6 6v3.4c0 .35.15.68.4.92l1.6 1.6A1 1 0 0 0 8.7 14h6.6a1 1 0 0 0 .7-.3l1.6-1.6c.25-.24.4-.57.4-.92V8a6 6 0 0 0-6-6z"/></svg>
+        </div>
+        <div class="feature-title">Professional Certificates</div>
+        <div class="feature-text">Generate branded PDF certificates with unique verification codes. Issue individually or in bulk.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="feature-title">Multi-Tenant Teams</div>
+        <div class="feature-text">Owner, Admin, Event Manager, Staff, and Volunteer roles with granular permissions per organization.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        </div>
+        <div class="feature-title">Reports & Analytics</div>
+        <div class="feature-text">Track registrations, attendance rates, and certificate issuance across all your events. Export to CSV.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Who it's for -->
+  <div class="section" id="who" style="padding-top:0;">
+    <h2 class="section-title">Built for every type of organization</h2>
+    <p class="section-sub">From NGOs to bootcamps to government programs</p>
+    <div class="features-grid">
+      <div class="feature-card" style="padding:18px 24px;">
+        <div class="feature-title">NGOs & Foundations</div>
+      </div>
+      <div class="feature-card" style="padding:18px 24px;">
+        <div class="feature-title">Universities & Schools</div>
+      </div>
+      <div class="feature-card" style="padding:18px 24px;">
+        <div class="feature-title">Bootcamps & Training Centers</div>
+      </div>
+      <div class="feature-card" style="padding:18px 24px;">
+        <div class="feature-title">Government Programs</div>
+      </div>
+      <div class="feature-card" style="padding:18px 24px;">
+        <div class="feature-title">Corporate Learning</div>
+      </div>
+      <div class="feature-card" style="padding:18px 24px;">
+        <div class="feature-title">Conferences & Summits</div>
+      </div>
+      <div class="feature-card" style="padding:18px 24px;">
+        <div class="feature-title">Community Organizations</div>
+      </div>
+      <div class="feature-card" style="padding:18px 24px;">
+        <div class="feature-title">Professional Associations</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-section">
+    <h2 class="cta-title">Start managing events today</h2>
+    <p class="cta-sub">Free for up to 5 events and 500 participants. No credit card required.</p>
+    <a href="app.html#/signup" class="btn btn-primary btn-xl" style="display:inline-flex;align-items:center;gap:6px;">
+      <span>Create Your Organization</span>
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </a>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-logo">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" width="16" height="16" fill="none" style="margin-right:4px;"><path d="M 25 15 H 42 A 8 8 0 0 0 58 15 H 75 A 10 10 0 0 1 85 25 V 95 A 10 10 0 0 1 75 105 H 58 A 8 8 0 0 0 42 105 H 25 A 10 10 0 0 1 15 95 V 25 A 10 10 0 0 1 25 15 Z" fill="#16A34A" /><rect x="23" y="27" width="54" height="54" rx="8" ry="8" fill="white" /><circle cx="50" cy="42" r="7" fill="#16A34A" /><path d="M 36 60 C 36 52, 64 52, 64 60 Z" fill="#16A34A" /><rect x="34" y="66" width="32" height="3.5" rx="1.75" fill="#E2EDE9" /><rect x="34" y="73" width="20" height="3.5" rx="1.75" fill="#E2EDE9" /><circle cx="76" cy="90" r="17" fill="white" /><circle cx="76" cy="90" r="13.5" fill="#16A34A" /><path d="M 70 90 L 74 94 L 82 86" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" /></svg> EventPass
+    </div>
+    <div class="footer-links">
+      <a href="app.html#/login">Dashboard</a>
+      <a href="verify.html">Verify Certificate</a>
+      <a href="#features">Features</a>
+    </div>
+    <div style="font-size:12px;color:#4a5170;">© 2026 EventPass. All rights reserved.</div>
+  </footer>
+
+</body>
+</html>

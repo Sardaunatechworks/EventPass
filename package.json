@@ -1,0 +1,20 @@
+{
+  "name": "eventpass",
+  "version": "1.0.0",
+  "description": "EventPass — Multi-Tenant SaaS Platform for Event Management",
+  "scripts": {
+    "dev": "npx serve . -p 3000 --cors",
+    "start": "npx serve . -p 3000 --cors",
+    "deploy:functions": "supabase functions deploy send-email && supabase functions deploy generate-certificate && supabase functions deploy verify-ticket && supabase functions deploy create-staff",
+    "db:push": "supabase db push",
+    "db:reset": "supabase db reset"
+  },
+  "devDependencies": {
+    "serve": "^14.2.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "license": "UNLICENSED",
+  "private": true
+}

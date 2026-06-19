@@ -1,0 +1,27 @@
+{
+  "version": 2,
+  "name": "eventpass",
+  "rewrites": [
+    { "source": "/app/:path*", "destination": "/app.html" },
+    { "source": "/register/:path*", "destination": "/register.html" },
+    { "source": "/verify/:path*", "destination": "/verify.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
+        { "key": "X-XSS-Protection", "value": "1; mode=block" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.resend.com;"
+        }
+      ]
+    }
+  ],
+  "env": {
+    "APP_ENV": "production"
+  }
+}
