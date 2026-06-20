@@ -31,6 +31,7 @@ export const Config = {
     url: window.location.origin,
     env: getMetaContent('app-env') || 'development',
     version: '1.0.0',
+    adminEmail: getMetaContent('platform-admin-email') || 'admin@myeventpass.com.ng',
   },
 
   // Defaults

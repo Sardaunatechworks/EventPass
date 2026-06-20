@@ -4,6 +4,7 @@
 // ============================================================
 import { toggleSidebar, closeSidebar } from '../app.js';
 import { icon } from '../utils/icons.js';
+import { Config } from '../config.js';
 
 const NAV_ITEMS = [
   { path: '/',                    icon: 'dashboard',    label: 'Dashboard' },
@@ -49,28 +50,46 @@ export function renderSidebar(container, session) {
     ? org.name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase()
     : 'EP';
 
-  container.innerHTML = `
-    <a href="#/" class="sidebar-logo" aria-label="EventPass Home">
-      <div class="sidebar-logo-icon">
-        ${icon('logo')}
-      </div>
-      <span class="sidebar-logo-text">EventPass</span>
-    </a>
+    let adminSectionHTML = '';
+    if (session.user?.email === Config.app.adminEmail) {
+      adminSectionHTML = `
+        <div class="sidebar-section-label">Platform Admin</div>
+        <a
+          href="#/admin"
+          class="sidebar-link"
+          data-path="/admin"
+          id="nav-admin"
+          aria-label="Admin Panel"
+        >
+          ${icon('dashboard')}
+          <span>Admin Panel</span>
+        </a>
+      `;
+    }
 
-    <div class="sidebar-org" id="org-switcher-btn" title="${org?.name || ''}">
-      <div style="display:flex;align-items:center;gap:8px;">
-        <div class="avatar" style="width:26px;height:26px;font-size:10px;border-radius:6px;${org?.primary_color ? `background:${org.primary_color}18;border-color:${org.primary_color}33;color:${org.primary_color};` : ''}">${orgInitials}</div>
-        <div style="flex:1;min-width:0;">
-          <div class="sidebar-org-name">${org?.name || 'No Organization'}</div>
-          <div class="sidebar-org-role">${formatRole(role)}</div>
+    container.innerHTML = `
+      <a href="#/" class="sidebar-logo" aria-label="EventPass Home">
+        <div class="sidebar-logo-icon">
+          ${icon('logo')}
         </div>
-        <span style="color:var(--color-text-3);display:flex;align-items:center;">${icon('chevronDown', 'icon-sm')}</span>
-      </div>
-    </div>
+        <span class="sidebar-logo-text">EventPass</span>
+      </a>
 
-    <nav class="sidebar-nav" aria-label="Navigation">
-      ${navHTML}
-    </nav>
+      <div class="sidebar-org" id="org-switcher-btn" title="${org?.name || ''}">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="avatar" style="width:26px;height:26px;font-size:10px;border-radius:6px;${org?.primary_color ? `background:${org.primary_color}18;border-color:${org.primary_color}33;color:${org.primary_color};` : ''}">${orgInitials}</div>
+          <div style="flex:1;min-width:0;">
+            <div class="sidebar-org-name">${org?.name || 'No Organization'}</div>
+            <div class="sidebar-org-role">${formatRole(role)}</div>
+          </div>
+          <span style="color:var(--color-text-3);display:flex;align-items:center;">${icon('chevronDown', 'icon-sm')}</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Navigation">
+        ${navHTML}
+        ${adminSectionHTML}
+      </nav>
 
     <div class="sidebar-footer">
       <button

@@ -10,6 +10,7 @@ import { PermissionChecker } from './utils/permissions.js';
 import { Toast } from './components/toast.js';
 import { renderSidebar, updateSidebarActiveLink } from './components/sidebar.js';
 import { renderTopbar } from './components/topbar.js';
+import { Config } from './config.js';
 
 // Detect recovery flow before Supabase client clears the URL hash
 const initHashParams = new URLSearchParams(window.location.hash.slice(1));
@@ -43,6 +44,7 @@ const modules = {
   programs: () => import('./modules/programs/programs.js'),
   login: () => import('./modules/auth/login.js'),
   signup: () => import('./modules/auth/signup.js'),
+  admin: () => import('./modules/admin/admin.js'),
 };
 
 // ── App Session ───────────────────────────────────────────────
@@ -88,11 +90,24 @@ router.use(async (path, params, query) => {
   }
 
   if (!AppSession.org) {
+    if (AppSession.user?.email === Config.app.adminEmail) {
+      if (path === '/admin') return true;
+      router.replace('/admin');
+      return false;
+    }
     showOrgSetup();
     return false;
   }
 
   // Route-specific permission checks
+  if (path === '/admin') {
+    if (AppSession.user?.email !== Config.app.adminEmail) {
+      Toast.error('Unauthorized access.');
+      router.replace('/');
+      return false;
+    }
+  }
+
   if (path === '/events/new') {
     if (!AppSession.permissions?.can('events:create')) {
       Toast.error('Permission denied.');
@@ -240,6 +255,11 @@ router
     setPageTitle('Organization Settings');
     renderOrgSettings(getContentEl(), AppSession);
   })
+  .on('/admin', async () => {
+    const { renderAdmin } = await modules.admin();
+    setPageTitle('Admin Panel');
+    renderAdmin(getContentEl(), AppSession);
+  })
   .on('/organization/staff', async () => {
     const { renderOrgStaff } = await modules.orgStaff();
     setPageTitle('Team & Staff');
@@ -332,6 +352,12 @@ async function initSession() {
 
     const orgContext = await resolveOrganization(user.id);
 
+    if (orgContext && orgContext.suspended) {
+      buildSuspendedShell();
+      router.init();
+      return;
+    }
+
     AppSession.set({
       user,
       org: orgContext?.org || null,
@@ -350,6 +376,23 @@ async function initSession() {
 
 function buildAppShell() {
   if (!AppSession.org) {
+    if (AppSession.user?.email === Config.app.adminEmail) {
+      document.body.innerHTML = `
+        <div class="app-shell">
+          <div id="sidebar-overlay" class="sidebar-overlay"></div>
+          <nav id="sidebar" class="sidebar" aria-label="Main navigation"></nav>
+          <div class="main-content">
+            <header id="topbar" class="topbar"></header>
+            <main id="page-content" class="page-content" role="main"></main>
+          </div>
+        </div>
+      `;
+      renderSidebar(document.getElementById('sidebar'), AppSession);
+      renderTopbar(document.getElementById('topbar'), AppSession, router);
+      const overlay = document.getElementById('sidebar-overlay');
+      overlay?.addEventListener('click', closeSidebar);
+      return;
+    }
     buildOrgSetupShell();
     return;
   }
@@ -376,6 +419,25 @@ function buildAppShell() {
 function buildAuthShell() {
   document.body.innerHTML = `
     <div id="page-content" class="auth-page"></div>
+  `;
+}
+
+function buildSuspendedShell() {
+  document.body.innerHTML = `
+    <div class="auth-page">
+      <div class="auth-card" style="text-align:center;">
+        <div class="auth-logo">
+          <div class="auth-logo-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" width="36" height="36" fill="none"><path d="M 25 15 H 42 A 8 8 0 0 0 58 15 H 75 A 10 10 0 0 1 85 25 V 95 A 10 10 0 0 1 75 105 H 58 A 8 8 0 0 0 42 105 H 25 A 10 10 0 0 1 15 95 V 25 A 10 10 0 0 1 25 15 Z" fill="#DC2626" /><rect x="23" y="27" width="54" height="54" rx="8" ry="8" fill="white" /><circle cx="50" cy="42" r="7" fill="#DC2626" /><path d="M 36 60 C 36 52, 64 52, 64 60 Z" fill="#DC2626" /></svg></div>
+          <span class="auth-logo-text">EventPass</span>
+        </div>
+        <h1 class="auth-title">Organization Suspended</h1>
+        <p class="auth-subtitle">Your organization access has been suspended by the platform owner.</p>
+        <div class="field-error" style="display:block;margin-bottom:20px;text-align:center;padding:12px;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;font-size:13px;line-height:1.5;color:#dc2626;">
+          Please contact support or the administrator to resolve this issue.
+        </div>
+        <button class="btn btn-secondary btn-full btn-lg" onclick="localStorage.clear(); sessionStorage.clear(); window.location.reload();">Sign Out</button>
+      </div>
+    </div>
   `;
 }
 

@@ -54,6 +54,20 @@ export async function resolveOrganization(userId) {
     return result;
   }
 
+  // Detect if the organization is suspended (member exists but org query was filtered out)
+  if (userId) {
+    const { data: memberships } = await supabase
+      .from('organization_members')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('is_active', true)
+      .limit(1);
+    
+    if (memberships && memberships.length > 0) {
+      return { suspended: true };
+    }
+  }
+
   return null;
 }
 
