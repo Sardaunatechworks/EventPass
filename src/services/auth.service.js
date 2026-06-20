@@ -24,6 +24,7 @@ export const AuthService = {
       email,
       password,
       options: {
+        emailRedirectTo: `${window.location.origin}/app.html`,
         data: {
           full_name: metadata.fullName || '',
           ...metadata,
