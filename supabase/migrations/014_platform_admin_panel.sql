@@ -131,35 +131,75 @@ $$;
 
 
 -- 2. Seed Super Admin User securely
-INSERT INTO auth.users (
-  instance_id,
-  id,
-  aud,
-  role,
-  email,
-  encrypted_password,
-  email_confirmed_at,
-  raw_app_meta_data,
-  raw_user_meta_data,
-  created_at,
-  updated_at,
-  confirmation_token,
-  recovery_token
-)
-SELECT 
-  '00000000-0000-0000-0000-000000000000',
-  uuid_generate_v4(),
-  'authenticated',
-  'authenticated',
-  'admin@myeventpass.com.ng',
-  extensions.crypt('EventPassAdmin2026!', extensions.gen_salt('bf', 10)),
-  NOW(),
-  '{"provider": "email", "providers": ["email"]}',
-  '{"full_name": "Platform Owner", "must_change_password": true}',
-  NOW(),
-  NOW(),
-  '',
-  ''
-WHERE NOT EXISTS (
-  SELECT 1 FROM auth.users WHERE email = 'admin@myeventpass.com.ng'
-);
+DO $$
+DECLARE
+  v_user_id UUID;
+BEGIN
+  -- Clean up any broken existing record to allow clean re-seed
+  DELETE FROM auth.identities WHERE identity_data ->> 'email' = 'admin@myeventpass.com.ng';
+  DELETE FROM auth.users WHERE email = 'admin@myeventpass.com.ng';
+
+  v_user_id := uuid_generate_v4();
+
+  -- A. Insert user
+  INSERT INTO auth.users (
+    instance_id,
+    id,
+    aud,
+    role,
+    email,
+    encrypted_password,
+    email_confirmed_at,
+    recovery_sent_at,
+    last_sign_in_at,
+    raw_app_meta_data,
+    raw_user_meta_data,
+    created_at,
+    updated_at,
+    confirmation_token,
+    email_change,
+    email_change_token_new,
+    recovery_token,
+    is_sso_user
+  ) VALUES (
+    '00000000-0000-0000-0000-000000000000',
+    v_user_id,
+    'authenticated',
+    'authenticated',
+    'admin@myeventpass.com.ng',
+    extensions.crypt('EventPassAdmin2026!', extensions.gen_salt('bf', 10)),
+    now(),
+    now(),
+    now(),
+    '{"provider":"email","providers":["email"]}',
+    '{"full_name":"Platform Owner","must_change_password":true}',
+    now(),
+    now(),
+    '',
+    '',
+    '',
+    '',
+    false
+  );
+
+  -- B. Insert identity linking user to email provider (avoids GoTrue 500 login crash)
+  INSERT INTO auth.identities (
+    id,
+    user_id,
+    identity_data,
+    provider,
+    provider_id,
+    last_sign_in_at,
+    created_at,
+    updated_at
+  ) VALUES (
+    v_user_id,
+    v_user_id,
+    json_build_object('sub', v_user_id::text, 'email', 'admin@myeventpass.com.ng'),
+    'email',
+    v_user_id::text,
+    now(),
+    now(),
+    now()
+  );
+END $$;
