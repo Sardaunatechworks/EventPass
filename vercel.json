@@ -2,6 +2,7 @@
   "version": 2,
   "name": "eventpass",
   "rewrites": [
+    { "source": "/admin", "destination": "/app.html" },
     { "source": "/app/:path*", "destination": "/app.html" },
     { "source": "/register/:path*", "destination": "/register.html" },
     { "source": "/verify/:path*", "destination": "/verify.html" }
