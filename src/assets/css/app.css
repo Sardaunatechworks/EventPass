@@ -1295,6 +1295,29 @@ label, .form-label {
   .topbar { padding: 0 var(--space-4); }
   .auth-card { padding: var(--space-6); }
   .attendance-number { font-size: 36px; }
+
+  /* Responsive enhancements for mobile first feel */
+  .card-body, .modal-body { padding: var(--space-4); }
+  
+  /* Breadcrumbs: show only current page title on mobile to save space */
+  .topbar-breadcrumb a,
+  .topbar-breadcrumb svg {
+    display: none !important;
+  }
+
+  /* Force wrap custom detail panels and flex rows on mobile */
+  .flex-wrap-mobile {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    gap: var(--space-3) !important;
+  }
+  .flex-wrap-mobile .btn,
+  .flex-wrap-mobile a,
+  .flex-wrap-mobile button {
+    width: 100% !important;
+    justify-content: center;
+  }
 }
 
 @media (max-width: 480px) {

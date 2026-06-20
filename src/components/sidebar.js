@@ -2,7 +2,7 @@
 // EventPass: src/components/sidebar.js
 // Dashboard sidebar navigation — clean white + green design
 // ============================================================
-import { toggleSidebar } from '../app.js';
+import { toggleSidebar, closeSidebar } from '../app.js';
 import { icon } from '../utils/icons.js';
 
 const NAV_ITEMS = [
@@ -97,6 +97,13 @@ export function renderSidebar(container, session) {
   });
 
   updateSidebarActiveLink(window.location.hash.slice(1) || '/');
+
+  // Close sidebar on link click (for mobile layout)
+  container.querySelectorAll('.sidebar-link[data-path]').forEach(link => {
+    link.addEventListener('click', () => {
+      closeSidebar();
+    });
+  });
 }
 
 export function updateSidebarActiveLink(path) {

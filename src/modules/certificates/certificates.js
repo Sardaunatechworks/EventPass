@@ -51,7 +51,7 @@ export async function renderCertificates(container, session, eventId) {
           <a href="#/events/${eventId}" class="text-sm text-muted" style="text-decoration:none;display:inline-flex;align-items:center;gap:5px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg> ${event.title}</a>
           <h1 class="page-title mt-2">Certificates</h1>
         </div>
-        <div class="flex gap-2">
+        <div class="flex gap-2 flex-wrap-mobile">
           ${permissions?.can('certificates:issue') ? `
             <button class="btn btn-primary" id="bulk-issue-btn" style="display:inline-flex;align-items:center;gap:6px;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg> Issue to All Attendees</button>
           ` : ''}
